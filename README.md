@@ -95,7 +95,7 @@ python inference_close.py --model [model] --api_key [api_key] --base_url [base_u
 We propose TreeThinker, a pipeline that injects table hierarchies into instructions for enhanced reasoning. It utilizes a tree structure to organize hierarchical headers and guides the language model to better perceive table structures, thereby improving performance on complex table tasks.
 
 <p align="center">
-<img src="assets/TreeThinker.png" width="70%" alt="TreeThinker pipeline" />
+<img src="assets/TreeThinker.png" width="60%" alt="TreeThinker pipeline" />
 </p>
 
 Refer to our **paper**() for more details.
