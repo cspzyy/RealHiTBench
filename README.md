@@ -16,7 +16,7 @@ Official repository for paper `RealHiTBench: A Comprehensive Realistic Hierarchi
 
 ## Overview
 
-**RealHiTBench** is a challenging benchmark designed to evaluate the ability of large language models (LLMs) and multimodal LLMs to understand and reason over complex, real-world **hierarchical tables**. It features diverse question types and input formats—including *LaTeX*, *HTML*, and *PNG*—across 24 domains, with 708 tables and 3,752 QA pairs. Unlike existing datasets that focus on flat structures, RealHiTBench includes rich structural complexity such as nested sub-tables and multi-level headers, making it a comprehensive resource for advancing table understanding in both text and visual modalities.
+**RealHiTBench** is a challenging benchmark designed to evaluate the ability of large language models (LLMs) and multimodal LLMs (MLMs) to understand and reason over complex, real-world **hierarchical tables**. It features diverse question types and input formats—including *LaTeX*, *HTML*, and *PNG*—across 24 domains, with 708 tables and 3,752 QA pairs. Unlike existing datasets that focus on flat structures, RealHiTBench includes rich structural complexity such as nested sub-tables and multi-level headers, making it a comprehensive resource for advancing table understanding in both text and visual modalities.
 
 ## Complex Structures
 
@@ -37,4 +37,68 @@ Here is a complex table sample used to showcase the above complex structure.
 <p align="center">
 <img src="assets/table_sample.png" width="70%" alt="Complex Table Sample" />
 </p>
+
+## Procedure for Evaluation
+
+### Step 1. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 2. Download the Dataset
+
+Download [**RealHiTBench**](https://huggingface.co/datasets/spzy/RealHiTBench) from Hugging Face to the `data` directory.
+
+### Step 3. Run Model Inference & Obtain Evaluation Results
+
+We've designed the inference & evaluation code to be as convenient as possible. As mentioned above, we evaluate the performance of LLMs, MLMS, and their combination. The scripts are as follows:
+
+#### For Open-Source LLMs:
+
+```bash
+python inference_llm.py --model [model] --model_dir [model_dir] --max_input [max_input]
+```
+
+**Descriptions of Arguments:**
+[model]: The name of the model currently being evaluated, which is used to name the results.
+[model_dir]: Directory of the model, which may be from the community or from a local source.
+[max_input]: Restrictions on input length (must be entered according to the current model; otherwise, it defaults to 0).
+
+#### For Open-Source MLMs:
+
+For MLMs with image-based input:
+
+```bash
+python inference_mlm.py --model [model] --model_dir [model_dir] --max_input [max_input]
+```
+
+For MLMs with image+text-based input:
+
+```bash
+python inference_mix.py --model [model] --model_dir [model_dir] --max_input [max_input]
+```
+
+#### For Close-Source models:
+
+```bash
+python inference_close.py --model [model] --api_key [api_key] --base_url [base_url]
+```
+
+**Descriptions of Arguments:**
+[model]: The name of the model currently being evaluated, which is used to name the results.
+[api_key]: The API key required to run the model.
+[base_url]: The URL of the platform where the model is located.
+
+## TreeThinker
+
+We propose TreeThinker, a pipeline that injects table hierarchies into instructions for enhanced reasoning. It utilizes a tree structure to organize hierarchical headers and guides the language model to better perceive table structures, thereby improving performance on complex table tasks.
+
+<p align="center">
+<img src="assets/TreeThinker.png" width="70%" alt="TreeThinker pipeline" />
+</p>
+
+Refer to our **paper**() for more details.
+
+Since TreeThinker is a pipeline based on hierarchy extraction and prompt engineering, you can evaluate how your model performs when combined with TreeThinker by replacing the Python program in the aforementioned scripts (e.g., changing `inference_llm.py` to `inference_llm_tree_self_v3_1.py`).
 
