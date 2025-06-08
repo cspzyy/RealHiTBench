@@ -35,6 +35,6 @@ We have collected as comprehensive a set of realistic hierarchical tables as pos
 Here is a complex table sample used to showcase the above complex structure.
 
 <p align="center">
-<img src="assets/table_sample.png" width="100%" alt="Complex Table Sample" />
+<img src="assets/table_sample.png" width="80%" alt="Complex Table Sample" />
 </p>
 
