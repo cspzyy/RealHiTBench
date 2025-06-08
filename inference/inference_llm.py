@@ -22,7 +22,6 @@ from matplotlib import pyplot as plt
 import traceback
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-os.environ['CUDA_VISIBLE_DEVICES'] = '3,5,7'
 
 @timeout(15)
 def execute(c):

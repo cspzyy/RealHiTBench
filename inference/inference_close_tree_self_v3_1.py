@@ -22,7 +22,6 @@ from utils.chart_metric_util import *
 from matplotlib import pyplot as plt
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-os.environ['CUDA_VISIBLE_DEVICES'] = '1,2,3,4'
 
 @timeout(15)
 def execute(c):

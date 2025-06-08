@@ -6,7 +6,6 @@ from utils.common_util import *
 import time
 import re
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "5"
 
 device = 'cuda'
 
