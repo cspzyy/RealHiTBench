@@ -102,3 +102,18 @@ Refer to our **paper**() for more details.
 
 Since TreeThinker is a pipeline based on hierarchy extraction and prompt engineering, you can evaluate how your model performs when combined with TreeThinker by replacing the Python program in the aforementioned scripts (e.g., changing `inference_llm.py` to `inference_llm_tree_self_v3_1.py`).
 
+## Citation
+
+If you find RealHiTBench is useful in your work, please consider citing the paper:
+
+```bibtext
+@misc{wu2025realhitbenchcomprehensiverealistichierarchical,
+      title={RealHiTBench: A Comprehensive Realistic Hierarchical Table Benchmark for Evaluating LLM-Based Table Analysis}, 
+      author={Pengzuo Wu and Yuhang Yang and Guangcheng Zhu and Chao Ye and Hong Gu and Xu Lu and Ruixuan Xiao and Bowen Bao and Yijing He and Liangyu Zha and Wentao Ye and Junbo Zhao and Haobo Wang},
+      year={2025},
+      eprint={2506.13405},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2506.13405}, 
+}
+```
