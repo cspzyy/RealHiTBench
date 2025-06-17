@@ -11,7 +11,7 @@
 Official repository for paper `RealHiTBench: A Comprehensive Realistic Hierarchical Table Benchmark for Evaluating LLM-Based Table Analysis`
 
 <p align="left">
-    <a href="">📖Paper</a>  <a href="https://huggingface.co/datasets/spzy/RealHiTBench">⌨️RealHiTBench</a>
+    <a href="https://arxiv.org/abs/2506.13405">📖Paper</a>  <a href="https://huggingface.co/datasets/spzy/RealHiTBench">⌨️RealHiTBench</a>
 </p>
 
 ## Overview
