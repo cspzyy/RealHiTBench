@@ -98,7 +98,7 @@ We propose **TreeThinker**, a pipeline that injects table hierarchies into instr
 <img src="assets/TreeThinker.png" width="60%" alt="TreeThinker pipeline" />
 </p>
 
-Refer to our **paper**() for more details.
+Refer to our **[paper](https://arxiv.org/abs/2506.13405)** for more details.
 
 Since TreeThinker is a pipeline based on hierarchy extraction and prompt engineering, you can evaluate how your model performs when combined with TreeThinker by replacing the Python program in the aforementioned scripts (e.g., changing `inference_llm.py` to `inference_llm_tree_self_v3_1.py`).
 
