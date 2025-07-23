@@ -64,7 +64,7 @@ python inference_llm.py --model [model] --model_dir [model_dir] --max_input [max
 - [model]: The name of the model currently being evaluated, which is used to name the results.<br>
 - [model_dir]: Directory of the model, which may be from the community or from a local source.<br>
 - [max_input]: Restrictions on input length (must be entered according to the current model; otherwise, it defaults to 0).<br>
-- [format]: The format of table file to be evaluated. Choose from `latex`, `html`, `csv` or `markdown`. (The default value is `latex`.)
+- [format]: The format of table file to be evaluated. Choose from `latex`, `html`, `csv` or `markdown` (The default value is `latex`).
 
 #### For Open-Source MLMs:
 
