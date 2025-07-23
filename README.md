@@ -60,11 +60,11 @@ We've designed the inference & evaluation code to be as convenient as possible. 
 python inference_llm.py --model [model] --model_dir [model_dir] --max_input [max_input] --format [format]
 ```
 
-**Descriptions of Arguments:**
-[model]: The name of the model currently being evaluated, which is used to name the results.<br>
-[model_dir]: Directory of the model, which may be from the community or from a local source.<br>
-[max_input]: Restrictions on input length (must be entered according to the current model; otherwise, it defaults to 0).<br>
-[format]: The format of table file to be evaluated. Choose from `latex`, `html`, `csv` or `markdown`. (The default value is `latex`.)
+**Descriptions of Arguments:** <br>
+- [model]: The name of the model currently being evaluated, which is used to name the results.<br>
+- [model_dir]: Directory of the model, which may be from the community or from a local source.<br>
+- [max_input]: Restrictions on input length (must be entered according to the current model; otherwise, it defaults to 0).<br>
+- [format]: The format of table file to be evaluated. Choose from `latex`, `html`, `csv` or `markdown`. (The default value is `latex`.)
 
 #### For Open-Source MLMs:
 
@@ -86,10 +86,10 @@ python inference_mix.py --model [model] --model_dir [model_dir] --format [format
 python inference_close.py --model [model] --api_key [api_key] --base_url [base_url] --format [format]
 ```
 
-**Descriptions of Arguments:**
-[model]: The name of the model currently being evaluated, which is used to name the results.<br>
-[api_key]: The API key required to run the model.<br>
-[base_url]: The URL of the platform where the model is located.<br>
+**Descriptions of Arguments:** <br>
+- [model]: The name of the model currently being evaluated, which is used to name the results.<br>
+- [api_key]: The API key required to run the model.<br>
+- [base_url]: The URL of the platform where the model is located.<br>
 
 ## TreeThinker
 
