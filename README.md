@@ -68,7 +68,7 @@ python inference_llm.py --model [model] --model_dir [model_dir] --max_input [max
 
 #### For Open-Source MLMs:
 
-Due to the lack of universality in model loading and inference among MLMs, the script currently only supports model_type = ['llama3_2_vl', 'llava', 'qwen2_vl'].
+Due to the lack of universality in model loading and inference among MLMs, the script currently only supports `model_type = ['llama3_2_vl', 'llava', 'qwen2_vl']`.
 If you need to test additional MLMs, please consult the official documentation of the model and modify the script accordingly.
 This script will also be continuously updated...
 
