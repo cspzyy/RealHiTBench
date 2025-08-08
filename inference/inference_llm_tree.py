@@ -6,6 +6,7 @@ import datetime
 import json
 import ast
 import argparse
+import traceback
 import pandas as pd
 from tqdm import tqdm
 import base64
@@ -138,7 +139,6 @@ def gen_solution(opt):
                 response,ori_res = get_final_answer(messages, answer_format, tokenizer, model)
                 reference = query['ProcessedAnswer']
                 chart_type = query['SubQType'].split()[0]
-                
                 python_code = re.sub(r"'[^']*\.xlsx'", "'"+table_file_path+"/"+query['FileName']+".xlsx'", response)
                 python_code = python_code.replace("table.xlsx", table_file_path+"/"+query['FileName']+".xlsx")
                 prediction, ecr_1 = exec_and_get_y_reference(python_code, chart_type)

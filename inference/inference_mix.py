@@ -122,7 +122,21 @@ def gen_solution(opt):
     table_file_path = os.path.abspath(f'../data/tables')
 
     all_eval_results = []
-    model, processor = load_model(opt)
+    
+    config = AutoConfig.from_pretrained(opt.model_dir)
+    model_type = config.model_type.lower()
+
+    tokenizer = AutoTokenizer.from_pretrained(opt.model_dir)
+
+    if model_type == 'llama3_2_vl':
+        model = load_llama_vl_model(opt)
+    elif model_type == 'llava':
+        model, image_processor = load_llava_model(opt)
+    elif model_type == 'qwen2_vl':
+        model, processor = load_qwen_vl_model(opt)
+    else:
+        raise ValueError(f"The model-specific loading script has not yet been configured; please consult the model's documentation.")
+
     for query in tqdm(querys):
         try:
             print("----------------------------- Current query: {} --------------------------".format(query['id']))
@@ -132,7 +146,7 @@ def gen_solution(opt):
             image_file = f'{image_file_path}/{query["FileName"]}.png'
             metric_scores = {}
             if question_type == 'Visualization':
-                response = get_final_answer(messages, image_file, answer_format, model, processor)
+                response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
                 reference = query['ProcessedAnswer']
                 chart_type = query['SubQType'].split()[0]
                 python_code = re.sub(r"'[^']*\.xlsx'", "'"+table_file_path+"/"+query['FileName']+".xlsx'", response)
@@ -152,7 +166,7 @@ def gen_solution(opt):
             else:
                 reference = query['FinalAnswer']
                 if question_type == 'Data Analysis':
-                    response = get_final_answer(messages, image_file, answer_format, model, processor)
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
                     prediction = response
                     if query['SubQType'] == 'Summary Analysis' or query['SubQType'] == 'Anomaly Analysis':
                         eval_prompt = Eval_Prompt[query['SubQType']].format_map({
@@ -173,15 +187,15 @@ def gen_solution(opt):
                 elif question_type == 'Structure Comprehending':
                     image_file = f'{image_file_path}/{query["FileName"]}.png'
                     messages = build_messages(query, answer_format, opt)
-                    reference = get_final_answer(messages, image_file, answer_format, model, processor).split("<|eot_id|>")[0]
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt).split("<|eot_id|>")[0]
                     query["FileName"] = query["FileName"] + "_swap"
                     image_file = f'{image_file_path}/{query["FileName"]}.png'
                     messages = build_messages(query, answer_format, opt)
-                    response = get_final_answer(messages, image_file, answer_format, model, processor).split("<|eot_id|>")[0]
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt).split("<|eot_id|>")[0]
                     prediction = response
                     metric_scores = qa_metric.compute([reference], [prediction])
                 else:
-                    response = get_final_answer(messages, image_file, answer_format, model, processor)
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
                     prediction = response
                     metric_scores = qa_metric.compute([reference], [prediction])
             eval_result = {
@@ -201,7 +215,9 @@ def gen_solution(opt):
             all_eval_results.append(eval_result)
         
         except Exception as e:
-            print(str(e))
+            import traceback
+            print(f"Exception: {str(e)}")
+            traceback.print_exc()
     
     end_time = datetime.datetime.now()
     print(f"Total time taken: {end_time - start_time}")

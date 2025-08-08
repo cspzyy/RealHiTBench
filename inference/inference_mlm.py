@@ -1,7 +1,7 @@
 import sys,os
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(base_dir)
-
+import traceback
 import datetime
 import json
 import ast
@@ -77,11 +77,12 @@ def exec_and_get_y_reference(answer_code, chart_type):
     plt.close('all')
     return parsed_prediction, ecr_1
 
-def build_messages(query, answer_format):
+def build_messages(query, answer_format, table_path):
     question_type = query['QuestionType']
     if question_type == 'Data Analysis': TASK_PROMPT = Answer_Prompt[query['SubQType']]
     else : TASK_PROMPT = Answer_Prompt[question_type]
     QUESTION_PROMPT = User_Prompt.format_map({
+        'Table': read_file(table_path),
         'Question': query['Question'],
         "Answer_format": answer_format
     })
@@ -100,7 +101,7 @@ def gen_solution(opt):
     start_time  = datetime.datetime.now()
 
     dataset_path = os.path.abspath(f'../data')
-    with open(f'{dataset_path}/QA_structure.json', 'r') as fp:
+    with open(f'{dataset_path}/QA_final.json', 'r') as fp:
         dataset = json.load(fp)
         querys = dataset['queries']  
     output_file_path = os.path.abspath(f'../result')
@@ -118,19 +119,32 @@ def gen_solution(opt):
     table_file_path = os.path.abspath(f'../data/tables')
 
     all_eval_results = []
-    tokenizer, model = load_model(opt)
+    
+    config = AutoConfig.from_pretrained(opt.model_dir)
+    model_type = config.model_type.lower()
+
+    tokenizer = AutoTokenizer.from_pretrained(opt.model_dir)
+
+    if model_type == 'llama3_2_vl':
+        model = load_llama_vl_model(opt)
+    elif model_type == 'llava':
+        model, image_processor = load_llava_model(opt)
+    elif model_type == 'qwen2_vl':
+        model, processor = load_qwen_vl_model(opt)
+    else:
+        raise ValueError(f"The model-specific loading script has not yet been configured; please consult the model's documentation.")
 
     for query in tqdm(querys):
         try:
             print("----------------------------- Current query: {} --------------------------".format(query['id']))
             question_type = query['QuestionType']
             answer_format = get_answer_format(query)
-            messages = build_messages(query, answer_format)
+            messages = build_messages(query, answer_format, f'{file_path}/{query["FileName"]}.{file_extensions[opt.format]}')
             image_file = f'{image_file_path}/{query["FileName"]}.png'
 
             metric_scores = {}
             if question_type == 'Visualization':
-                response = get_final_answer(messages, image_file, answer_format, tokenizer, model, processor,)
+                response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
                 reference = query['ProcessedAnswer']
                 chart_type = query['SubQType'].split()[0]
                 python_code = re.sub(r"'[^']*\.xlsx'", "'"+table_file_path+"/"+query['FileName']+".xlsx'", response)
@@ -150,8 +164,8 @@ def gen_solution(opt):
             else:
                 reference = query['FinalAnswer']
                 if question_type == 'Data Analysis':
-                    response = get_final_answer(messages, image_file, answer_format, tokenizer, model, processor,)
-                    if query['SubQType'] == 'Summary Analysis' or query['SubQType'] == 'Anomaly Analysis':
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
+                    if query['SubQType'] not in ['Summary Analysis', 'Anomaly Analysis']:
                         eval_prompt = Eval_Prompt[query['SubQType']].format_map({
                             'Question': query['Question'],
                             'Table': read_file(f'{file_path}/{query["FileName"]}.{file_extensions[opt.format]}'),
@@ -161,6 +175,7 @@ def gen_solution(opt):
                     else:
                         eval_prompt = Eval_Prompt[query['SubQType']].format_map({
                             'Question': query['Question'],
+                            'Table': read_file(f'{file_path}/{query["FileName"]}.{file_extensions[opt.format]}'),
                             'Reference_Answer': query['FinalAnswer'],
                             'User_Answer': response
                         })
@@ -169,17 +184,17 @@ def gen_solution(opt):
                     metric_scores = qa_metric.compute([reference], [prediction])
                     metric_scores['GPT_EVAL'] = eval_score
                 elif question_type == 'Structure Comprehending':
-                    messages = build_messages(query, answer_format)
+                    messages = build_messages(query, answer_format, f'{file_path}/{query["FileName"]}.{file_extensions[opt.format]}')
                     image_file = f'{image_file_path}/{query["FileName"]}.png'
-                    reference = get_final_answer(messages, image_file, answer_format, tokenizer, model, processor)
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
                     query["FileName"] = query["FileName"] + "_swap"
                     image_file = f'{image_file_path}/{query["FileName"]}.png'
-                    messages = build_messages(query, answer_format)
-                    response = get_final_answer(messages, image_file, answer_format, tokenizer, model, processor)
+                    messages = build_messages(query, answer_format, f'{file_path}/{query["FileName"]}.{file_extensions[opt.format]}')
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
                     prediction = response
                     metric_scores = qa_metric.compute([reference], [prediction])
                 else:
-                    response = get_final_answer(messages, image_file, answer_format, tokenizer, model, processor,)
+                    response = get_multimodal_final_answer(messages, image_file, answer_format, tokenizer, model, processor, opt)
                     prediction = response
                     metric_scores = qa_metric.compute([reference], [prediction])
             eval_result = {
@@ -199,7 +214,9 @@ def gen_solution(opt):
             all_eval_results.append(eval_result)
         
         except Exception as e:
+            print(Exception)
             print(str(e))
+            print(traceback.format_exc())
 
     print(all_eval_results)
     print(output_file_path)
